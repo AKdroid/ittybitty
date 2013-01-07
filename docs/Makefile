@@ -52,7 +52,6 @@ html:
 gh-pages:
 	git checkout gh-pages
 	/bin/rm -rf build sources static
-	/bin/rm -rf ../build ../sources ../static
 	git checkout master $(GH_PAGES_SOURCES)
 	git reset HEAD
 	make html
