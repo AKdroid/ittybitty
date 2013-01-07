@@ -1,0 +1,2 @@
+class JsonDecodeError(Exception):
+    pass

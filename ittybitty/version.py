@@ -1,0 +1,1 @@
+ITTYBITTY_VERSION = "1.0PreAlpha1"

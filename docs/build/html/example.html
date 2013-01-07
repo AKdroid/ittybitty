@@ -1,0 +1,204 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>example: An sample project that uses ittybitty &mdash; ittybitty 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="ittybitty 1.0.0 documentation" href="index.html" />
+    <link rel="prev" title="introduction: What is ittybitty" href="introduction.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="introduction.html" title="introduction: What is ittybitty"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">ittybitty 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="example-an-sample-project-that-uses-ittybitty">
+<h1>example: An sample project that uses ittybitty<a class="headerlink" href="#example-an-sample-project-that-uses-ittybitty" title="Permalink to this headline">¶</a></h1>
+<p>Here we will illustrate example project that utilizes ittybitty to expose
+an application to the web.</p>
+<p>Lets consider the following simple application. It is a simple password store
+that allows users to store their passwords in a central location and then get
+them back.</p>
+<p>WARNING : This is a sample application and should not be used as an actual
+password store.</p>
+<p>Heres the inial code for the password store
+.. highlight:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">AES</span>
+
+<span class="n">BLOCK_SIZE</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">PADDING</span> <span class="o">=</span> <span class="s">&quot;{&quot;</span>
+
+<span class="k">class</span> <span class="nc">passwordstore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pwd_file</span><span class="p">,</span> <span class="n">master_password</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pwd_file</span> <span class="o">=</span> <span class="n">pwd_file</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">master_password</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encryptor</span> <span class="o">=</span> <span class="n">AES</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pwd_file</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_pwd_file</span><span class="p">(</span><span class="n">pwd_file</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">read_pwd_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">padd_pwd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pwd</span><span class="p">):</span>
+        <span class="k">return</span>  <span class="n">pwd</span> <span class="o">+</span> <span class="p">(</span><span class="n">BLOCK_SIZE</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">pwd</span><span class="p">)</span> <span class="o">%</span> <span class="n">BLOCK_SIZE</span><span class="p">)</span> <span class="o">*</span> <span class="n">PADDING</span>
+
+    <span class="k">def</span> <span class="nf">get_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+            <span class="n">encrypted_password</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="n">username</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encryptor</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">encrypted_password</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">PADDING</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">padd_pwd</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">[</span><span class="n">username</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encryptor</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+       <span class="k">with</span>  <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwd_file</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+           <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_data</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">master_pass</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s">&quot;Please enter master pwd</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">passwordstore</span><span class="p">(</span><span class="s">&quot;/tmp/foobax.pwd&quot;</span><span class="p">,</span> <span class="n">master_pass</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;add&quot;</span> <span class="p">:</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">store</span><span class="o">.</span><span class="n">add_password</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;get&quot;</span> <span class="p">:</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">print</span> <span class="n">store</span><span class="o">.</span><span class="n">get_password</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;UNKNOWN option!&quot;</span>
+    <span class="n">store</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>As you can see this is a fairly simple application that stores credentials in a
+file. Passwords are AES encrypted using a master_password. Lets see this app in
+use:</p>
+<div class="highlight-python"><pre>mercion@mwi-dev-II:/mwi/sandbox/password$ ./pwd.py add frank verner
+Please enter master pwd
+****
+mercion@mwi-dev-II:/mwi/sandbox/password$ ./pwd.py get frank
+Please enter master pwd
+****
+verner</pre>
+</div>
+<p>As you can see this simple app already has one interface via the cmd line. But
+woldnt it be awesome if we could access this app via the web so that we can use
+this password store even when you are not logged in to same machine as the
+password store.</p>
+<p>This is were ittybitty comes in handy. Lets make the following changes :
+1. Make the class passwordstore inherit from ittybitty
+2. Add in some web faceing methods
+3. Start the server.</p>
+<p>Thats all their is to it so lets get started. Heres the new application ..</p>
+<p>Now as you can see on line no X we have chanegd to base class for the
+passwordstore. We have also add in a new function called web_get_pwd on line
+number X. The  decorator on lin Y states tht this method is exposed via the web
+api and &#8216;/get_pwd&#8217; is the path to this api method. When a HTTP GET request is
+sent to /get_pwd the method on line X is called. The request that wsa made is
+passed in to the method. Lines  x,y extract what the suername for that request
+was and does a local lookup for that passowrd and returns it the the user.</p>
+<p>Heres an example of this appication now accessed via the web ...</p>
+<p>Thats all their is to it! Note that if you browse to &#8216;/help&#8217; you will get a list
+off all the functions that are exposed via the web and their doc strings...</p>
+<p>The same information is available via &#8216;/json-ref&#8217;...</p>
+<p>Now that we have out application exposed via the web wouldnt it be awsome if we
+had some form of HTTP authentication enabled so that not just anyone could
+browse your password store!</p>
+<p>See part 2..</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="introduction.html"
+                        title="previous chapter">introduction: What is ittybitty</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/example.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="introduction.html" title="introduction: What is ittybitty"
+             >previous</a> |</li>
+        <li><a href="index.html">ittybitty 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Mercion Wilathgamuwage.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
