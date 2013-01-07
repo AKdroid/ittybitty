@@ -13,7 +13,6 @@ the primary intent of serverving web pages.
 ittybitty was developed to make it easy to add restfull api's to existing
 application.
 
-
 This documentation is still under development
 
 
