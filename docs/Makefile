@@ -60,6 +60,8 @@ gh-pages:
 	/bin/rm -rf $(GH_PAGES_SOURCES) build
 	git add -A 
 	git commit -a -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`"
+	git push origin gh-pages
+	git checkout master
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
