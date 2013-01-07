@@ -46,6 +46,19 @@ html:
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
+
+
+gh-pages:
+	git checkout gh-pages
+	/bin/rm -rf build sources static
+	git checkout master $(GH_PAGES_SOURCES)
+	git reset HEAD
+	make html
+	mv -fv build/html/* ./
+	/bin/rm -rf $(GH_PAGES_SOURCES) build
+	git add -A 
+	git commit -a -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`"
+
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 	@echo
