@@ -6,7 +6,7 @@ import threading
 
 
 
-class testapplication(ittybitty.itty_server):
+class testapplication(ittybitty.ittybitty_server):
 
     @ittybitty.get("/")
     def index(self, request):
@@ -14,18 +14,17 @@ class testapplication(ittybitty.itty_server):
 
 
 
+
+
 class BasicTestCase(unittest.TestCase):
 
-    def setUp(self):
-        self.ta = testapplication()
-        self.ta.run_in_thread()
 
-    def tearDown(self): 
-        self.ta.stop()
-
-    def test_1_webservice_running(self):
-        response = urllib.urlopen("http://127.0.0.1:8080")
+    def test_1_start_up(self):
+        self.server = testapplication(host="10.50.159.204", port=7890)
+        self.server.start()
+        response = urllib.urlopen("http://10.50.159.204:7890/html-ref")
         self.assertEqual(response.getcode(), 200)
+        self.server.stop()
 
 
 #    def test_2_webserice_response(self):

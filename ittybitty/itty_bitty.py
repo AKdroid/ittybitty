@@ -689,7 +689,6 @@ if __name__ == "__main__":
             return "Hello World" 
 
     server = application(host="10.50.159.204")
-    try:
-        server.start()
-    except:
-        server.stop()
+    server.start()
+    time.sleep(20)
+    server.stop()
