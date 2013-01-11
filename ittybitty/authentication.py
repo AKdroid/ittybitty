@@ -10,7 +10,7 @@ All authentication handlers must inherit from the base_authentication_handler.
 import ConfigParser
 import pam
 import logging
-from ntlm import HTTPNtlmAuthHandler
+#from ntlm import HTTPNtlmAuthHandler
 
 log = logging.getLogger(__name__)
 
