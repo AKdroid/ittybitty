@@ -39,7 +39,9 @@ from log_utils import HtmlLogPage
 root_logger = logging.getLogger()
 root_logger.setLevel(logging.DEBUG)
 formatter = JSONFormatter()
-jfh = JSONFileHandler("/tmp/work.log", mode="w")
+log_folder  = tempfile.mkdtemp()
+log_file = os.path.join(log_folder, "ittybitty.log")
+jfh = JSONFileHandler(log_folder, mode="w")
 jfh.setFormatter(formatter)
 root_logger.addHandler(jfh)
 
