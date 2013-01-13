@@ -1,6 +1,39 @@
 from version import ITTYBITTY_VERSION
 DEFAULT_STYLE = '''
 
+.input {
+    border: 1px solid #006;
+    background: #ffc;
+    margin-left: 4.5em;
+}
+.button {
+    border: 1px solid #006;
+    background: #9cf;
+}
+label {
+    display: block;
+    width: 4em;
+    float: left;
+    text-align: right;
+    margin-right: 0.5em;
+}
+br { clear: left; }
+
+fieldset
+{
+border: 1px solid #781351;
+width: 20em
+}
+
+legend
+{
+color: #006;;
+background: #ffa20c;
+border: 1px solid #006;
+padding: 2px 6px
+}
+
+
 h1 {
 font-family:"Trebuchet MS", Arial, Helvetica, sans-serif; 
 font-size:1em

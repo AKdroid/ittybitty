@@ -16,7 +16,7 @@ setup(
     description = ("A simple extendible python web framework"),
     license = "BSD",
     url = "http://packages.python",
-    install_requires = ['pycrash'],
+    install_requires = ['pycrash', 'docutils'],
     dependency_links = ['https://github.com/mercion/pycrash/tarball/master#egg=PyCrash-1.0PreAlpha1'],
     packages=['ittybitty', 'tests'],
     long_description=read('README.txt'),

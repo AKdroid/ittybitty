@@ -2,7 +2,7 @@ from html_template import basepage
 
 from mappings import REQUEST_MAPPINGS
 from version import ITTYBITTY_VERSION
-
+from docstring_utils import decode_docstring
 import json 
 #from html_templares.css import css_main 
 
@@ -11,6 +11,10 @@ class HTML_reference_page(basepage):
 
     def __init__(self, *args, **kwargs):
         basepage.__init__(self, *args, **kwargs)
+
+        self.header = '''
+        <script src="http://code.jquery.com/jquery-latest.min.js"
+        type="text/javascript"></script>'''
 
         json_ref = generate_json_reference()
         ref = json.loads(json_ref)
@@ -33,15 +37,22 @@ class HTML_reference_page(basepage):
             <th> Example </th>
         </tr>'''
         for api in ref:
+            html, forms = decode_docstring(api["doc"],api["path"], api["method"])
+            print html
+            if " ".join(forms).strip() == '':
+                forms = ['''<input type="submit" class="button" onclick='window.open("%s")' />'''
+%api["path"]]
             row = '''
             <tr>
                 <td> {id} </td>
                 <td> {method} </td>
                 <td> {name} </td>
                 <td> <a href="{path_link}">{path}</a></td>
-                <td> {doc} </td>
-                <td> {example} </td>
-            </tr>'''.format( path_link = api["path"][1:], **api)
+                <td style="text-align:left;"> {html} </td>
+                <td width="350px"> {form} </td>
+            </tr>'''.format( path_link = api["path"][1:],
+                             html = html,
+                             form = "</hr>".join(forms), **api)
             table += row
         table += '</table>'
         self.body += table

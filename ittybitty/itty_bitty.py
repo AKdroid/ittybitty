@@ -41,7 +41,7 @@ root_logger.setLevel(logging.DEBUG)
 formatter = JSONFormatter()
 log_folder  = tempfile.mkdtemp()
 log_file = os.path.join(log_folder, "ittybitty.log")
-jfh = JSONFileHandler(log_folder, mode="w")
+jfh = JSONFileHandler(log_file, mode="w")
 jfh.setFormatter(formatter)
 root_logger.addHandler(jfh)
 
@@ -563,6 +563,7 @@ class ittybitty_server(threading.Thread):
             (re_url, url, callback), kwargs = find_matching_url(request)
             name = callback.__name__
             log.debug(REQUEST_MAPPINGS)
+            log.critical(name)
             log.debug("The callback function name is %s" %name)
             response = getattr(self, name)(request)
         except Exception, e:
