@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "ittybitty",
-    version = "1.0.0",
+    version = "1.0.pa1",
     author = "Mercion Wilathgamuwage",
     author_email = "mercion@mwilathg.com",
     description = ("A simple extendible python web framework"),
@@ -18,6 +18,6 @@ setup(
     url = "http://packages.python",
     install_requires = ['pycrash', 'docutils'],
     dependency_links = ['https://github.com/mercion/pycrash/tarball/master#egg=PyCrash-1.0PreAlpha1'],
-    packages=['ittybitty', 'tests'],
+    packages=['ittybitty'],
     long_description=read('README.txt'),
 )
