@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "ittybitty",
-    version = "1.0.pa2",
+    version = "1.0.pa4",
     author = "Mercion Wilathgamuwage",
     author_email = "mercion@mwilathg.com",
     description = ("A simple extendible python web framework"),
