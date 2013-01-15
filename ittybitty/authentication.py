@@ -8,7 +8,7 @@ All authentication handlers must inherit from the base_authentication_handler.
 '''
 
 import ConfigParser
-import pam
+#import pam
 import logging
 #from ntlm import HTTPNtlmAuthHandler
 
