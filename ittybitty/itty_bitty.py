@@ -186,8 +186,11 @@ class Request(object):
 
     def build_complex_dict(self):
         """Takes POST/PUT data and rips it apart into a dict."""
+        print self.body
         raw_data = cgi.FieldStorage(fp=StringIO.StringIO(self.body), environ=self._environ)
         query_dict = {}
+
+        print raw_data
 
         for field in raw_data:
             if isinstance(raw_data[field], list):
@@ -689,9 +692,20 @@ if __name__ == "__main__":
         def index(self, request):
             print request
             print dir(request)
-            return "Hello World" 
+            return "Hello World"
+
+        @post("/debug")
+        def debug(self, request):
+            if request.CONTENT_LENGTH > 0 :
+                if request.CONTENT_TYPE != "application/json":
+                    #Raise a content type error
+                    pass    
+            
+            print request.CONTENT_TYPE
+            print request.CONTENT_LENGTH
 
     server = application(host="10.50.159.204")
-    server.start()
-    time.sleep(20)
-    server.stop()
+    try:
+       server.start()
+    except:
+        server.stop()

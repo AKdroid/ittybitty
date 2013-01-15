@@ -6,6 +6,21 @@ from docstring_utils import decode_docstring
 import json 
 #from html_templares.css import css_main 
 
+ref_page_js = '''
+<script>                                                                        
+function rawPost(url, tid)                                                      
+{                                                                               
+                                                                                
+    $.ajax(url,                                                                 
+    {                                                                           
+      'data':document.getElementById(tid).value,                                
+      'type':"POST",                                                            
+      'processData': false,                                                     
+      'contentType':'application/json'                                          
+    });                                                                         
+  };                                                                            
+</script>
+'''
 
 class HTML_reference_page(basepage):
 
@@ -15,6 +30,7 @@ class HTML_reference_page(basepage):
         self.header = '''
         <script src="http://code.jquery.com/jquery-latest.min.js"
         type="text/javascript"></script>'''
+        self.header += ref_page_js 
 
         json_ref = generate_json_reference()
         ref = json.loads(json_ref)

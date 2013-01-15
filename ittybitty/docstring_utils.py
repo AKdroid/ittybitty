@@ -97,8 +97,18 @@ height: 1.2em; border:0;" />''' %(hash(key))
     form += '</fieldset>'
     form += '</form>'
     form += '\n\n'
-    return form 
+    return form
 
+def build_javascipt_poster(content, method, url):
+    form  = '''
+    <fieldset>
+    <textarea id="{id}" rows=15 cols=30>                                                  
+    {content}                                                                              
+    </textarea>
+<button onclick="rawPost('{url}', {id})">Submit</button>
+    </fieldset>'''.format(url = url, content=content, id=abs(hash(url)))
+    return form
+                              
 def decode_docstring(string, url, method):
     string  = unicode(string)
     html = html_body(string)
