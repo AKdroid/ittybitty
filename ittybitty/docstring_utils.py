@@ -1,6 +1,7 @@
-import locale
+#import locale
 import pkg_resources
-#locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+#locale.setlocale(locale.LC_ALL, 'en_gb.en_gb')
+#locale.setlocale(locale.LC_ALL, 'de_DE')
 import re
 from docutils import core, io
 

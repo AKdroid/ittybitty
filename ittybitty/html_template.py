@@ -86,7 +86,7 @@ class html_config(object):
 
 
 class basepage(object):
-    def __init__(self, url, html_config):
+    def __init__(self, url, html_config, *args, **kwargs):
         self.url = url
         self.html_config = html_config 
         self.styles = []

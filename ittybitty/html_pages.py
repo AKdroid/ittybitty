@@ -33,6 +33,7 @@ class HTML_reference_page(basepage):
         self.header += ref_page_js 
 
         json_ref = generate_json_reference()
+        json_ref = kwargs.get("json_ref", generate_json_reference())
         ref = json.loads(json_ref)
     
         self.body += '''<div id="secondary_header">
@@ -75,7 +76,7 @@ class HTML_reference_page(basepage):
 
 
 
-def generate_json_reference():
+def generate_json_reference(REQUEST_MAPPINGS=REQUEST_MAPPINGS):
     mappings_list = []
     for method in REQUEST_MAPPINGS.keys():
         for regex, path, function in REQUEST_MAPPINGS[method]:
