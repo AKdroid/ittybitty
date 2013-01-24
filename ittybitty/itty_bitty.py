@@ -565,8 +565,6 @@ class ittybitty_server(threading.Thread):
         try:
             (re_url, url, callback), kwargs = find_matching_url(request)
             name = callback.__name__
-            log.debug(REQUEST_MAPPINGS)
-            log.critical(name)
             log.debug("The callback function name is %s" %name)
             response = getattr(self, name)(request)
         except Exception, e:
@@ -618,14 +616,7 @@ class ittybitty_server(threading.Thread):
         log.info( 'Itty Bitty starting up WSGI server...')
         log.info( 'Listening on http://%s:%s...' % (self.host, self.port))
         print 'Listening on http://%s:%s...' % (self.host, self.port)
-        log.info( 'Browse to http://%s:%s/api for a list of API refernces' \
-                                                        %(self.host, self.port))
  
-
-        log.warn("Here is a log msg")
-        log.critical("This is a critisd")
-        log.error("Can she ssd")
-
         try:
             self.wsgiref_adapter(self.host, self.port)
         except KeyboardInterrupt:
