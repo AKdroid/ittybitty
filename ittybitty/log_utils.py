@@ -26,6 +26,11 @@ class JSONFileHandler(logging.FileHandler):
         with open(self.baseFilename, "w") as f:
             f.write(json.dumps(logs))
 
+LOG_COLORS = {  'INFO'  :   'black',
+                'DEBUG' :   'grey',
+                'WARNING':  'pink',
+                'ERROR' : 'orange',
+                'CRITICAL':'red' } 
 
 LOG_PAGE_STYLE = '''
 tr.WARNING {
@@ -42,118 +47,112 @@ font-color:grey;
 }
 '''
 
-class HtmlLogPage(basepage):
+
+class HtmlLogTail(basepage):
     def __init__(self, *args, **kwargs):
         '''
-        Represents the HTML log page. This opject will build the html log page
-        from the json logs stored in :param:`logfile`. :param`:`url` is the
-        the url of this page. (This is the url that the form will sent its GET
-        request to.
+        A log tail utlity based on Ajax
         '''
         basepage.__init__(self, *args, **kwargs)
-        self.json_logs = []
-        self.json_log_file = None
-        self._params = {}
-        self.styles.append(LOG_PAGE_STYLE)
 
+        self.header += r'''
+<script>
+function createRequest() {
+ var request = null;
+  try {
+   request = new XMLHttpRequest();
+  } catch (trymicrosoft) {
+   try {
+     request = new ActiveXObject("Msxml2.XMLHTTP");
+   } catch (othermicrosoft) {
+     try {
+      request = new ActiveXObject("Microsoft.XMLHTTP");
+     } catch (failed) {
+       request = null;
+     }
+   }
+ }
 
-    @property
-    def filter_params(self):
-        return self._params
+ if (request == null) {
+   //alert("Error creating request object!");
+ } else {
+   return request;
+ }
+}
 
-    @filter_params.setter
-    def filter_params(self, params):
+var request1 = createRequest();
+var request2 = createRequest();
+var request2A = createRequest();
+var request3 = createRequest();
 
+function getLog(timer) {
+
+var url = "/html-logs";
+request1.open("GET", url, true);
+request1.onreadystatechange = updatePage;
+request1.send(null);
+startTail(timer);
+}
+
+function startTail(timer) {
+if (timer == "stop") {
+stopTail();
+} else {
+t= setTimeout("getLog()",1000);
+}
+}
+
+function stopTail() {
+clearTimeout(t);
+var pause = "The log viewer has been paused. To begin viewing again, click the Start Viewer button.";
+logDiv = document.getElementById("log");
+var newNode=document.createTextNode(pause);
+logDiv.replaceChild(newNode,logDiv.childNodes[0]);
+}
+
+function updatePage() {
+if (request1.readyState == 4) {
+if (request1.status == 200) {
+var currentLogValue = request1.responseText.split("\n");
+eval(currentLogValue);
+logDiv = document.getElementById("log");
+var logLine = ' ';
+for (i=0; i < currentLogValue.length - 1; i++) {
+logLine += currentLogValue[i] + "<br/>\n";
+}
+logDiv.innerHTML=logLine;
+}
+}}
+</script>
         '''
-        This will build the html page. :parm:`params` speciefies if we want to
-        filter out of the core json file. So only json log records wich have a
-        subset of the same key, value pairs as params will be inclided in the html
-        page
-        '''
-        logs  = []
-        with open(self.json_log_file, "r") as f:
-            for line in f:
-                logs.append(json.loads(line))
+        self.body += '''
 
-        self.json_logs = logs 
+<div id="message" style="border:solid 1px #dddddd; width:500px;
+margin-left:25px; font-size:14px; font-family:san-serif,tahoma,arial;
+padding-left:15px; padding-right:15px; padding-top:10px; padding-bottom:20px;
+margin-top:20px; margin-bottom:10px; text-align:left;">
+<p>
+<h2>Log Viewer</h2>
 
-        matched_list = []
-        for log in self.json_logs:
-            if params :
-                if set(params.items()).issubset(set(log.items())):
-                    matched_list.append(log)
-            else:
-                matched_list.append(log)
-        
+<div>
+<button onclick="getLog('start');">Start Viewer</button>
+<button onclick="stopTail();">Stop Viewer</button>
+</div>
+explanation.  This is a working example of the AJAX Log File Viewer
+discussed there.
+</p>
+</div>
+</br
+</hr>
+<div id="log" style="border:solid 1px #dddddd; margin-left:25px;
+margin-top:20px; font-size:11px;
+padding-left:15px; padding-right:15px; padding-top:100px; padding-bottom:20px;
+margin-bottom:10px; text-align:left; height: 150px; overflow:auto;">
+<h3>Log Viewer Div</h3>
+This is the Log Viewer. To begin viewing the log live in this window, click
+Start Viewer. To stop the window refreshes, click Stop Viewer.
+</div>
 
-        table = '''<table>
-                    <tr>
-                        <th> Time </th>
-                        <th> Module </th>
-                        <th> Level </th>
-                        <th> Message </th>
-                    </tr>'''
-        
-
-        for item in matched_list :
-            table+= '''<tr class="{level}">
-                        <td>{time}</td>
-                        <td>{module}</td>
-                        <td>{level}</td>
-                        <td>{message}</td></tr>'''.format(time=item["asctime"],
-                                                         module=item["module"],
-                                                         level=item["level"],
-                                                         message=item["message"])
-        table += '</table>'
-
-        
-        self.body += '<h1> Log Viewer </h1>\n'
-        self.body += '<p> These same logs can be found in JSON format on <a\
-                            href="json-logs">here</a> </p>'
-        self.body += self.build_filter_box()
-        self.body += table
-
-        print self.body
-
-    def build_filter_box(self):
-        '''
-        This bilds a little filter box for the top of the page
-        '''
-        form = '''
-        <form name="filter" action={url} method="get">
-        <h3>Select what you want to filter by</h3>
-        <label> LogLevel </label>
-        <select name="level">
-            <option value="DEBUG">DEBUG</option>
-            <option value="INFO">INFO</option>
-            <option value="WARNING">WARNING</option>
-            <option value="CRITICAL">CRITICAL</option>
-            <option value="ERROR">ERROR</option>
-        </select>
-
-        <label>Logger</label>
-        <select name="module">
-            {module_options}
-        </select>
-        <input type="submit" value="Filter">
-        <a href="{url}">Reset Filtering</a>
-        </form></hr>\n\n'''.format(module_options = self._get_module_opts(), url=self.url)
-
-        return form
-
-    def _get_module_opts(self):
-        modules = []
-        for record in self.json_logs:
-            modules.append(record["module"])
-        modules = set(modules)
-
-        opts = ''
-        for module in modules:
-            opts += '<option value="{m}">{m}</option>\n'.format(m=module)
-        return opts
-
-
-
-
+    '''
 
         

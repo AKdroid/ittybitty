@@ -9,6 +9,7 @@ import time
 import mimetypes
 import os
 import re
+import json
 import StringIO
 import sys
 import traceback
@@ -33,8 +34,7 @@ from version import ITTYBITTY_VERSION
 
 from log_utils import JSONFormatter
 from log_utils import JSONFileHandler
-from log_utils import HtmlLogPage
-
+from log_utils import HtmlLogTail, LOG_COLORS 
 
 root_logger = logging.getLogger()
 root_logger.setLevel(logging.DEBUG)
@@ -565,7 +565,6 @@ class ittybitty_server(threading.Thread):
         try:
             (re_url, url, callback), kwargs = find_matching_url(request)
             name = callback.__name__
-            log.debug("The callback function name is %s" %name)
             response = getattr(self, name)(request)
         except Exception, e:
             return handle_error(e, request)
@@ -646,6 +645,8 @@ class ittybitty_server(threading.Thread):
         <a class="example" href="html-ref">/json-ref</a>
 
         This method will return a json page that contains a description
+:q
+:q
         of all of the methods exposed to this service.
         '''
 
@@ -658,10 +659,35 @@ class ittybitty_server(threading.Thread):
 
         '''
         params = request.build_get_dict()
-        page = HtmlLogPage(url="/html-logs", html_config=self.html_config)
-        page.json_log_file = jfh.baseFilename
-        page.filter_params = params
+
+        with open(jfh.baseFilename, "r") as f:
+            data = f.read()
+
+
+        html  = ''
+
+        for l in data.split("\n"):
+            l = l.strip()
+            if l != '':
+                log = json.loads(l)
+                line = '<p style="color:{c}">{m}</p>'.format(\
+                        c = LOG_COLORS[log["level"]],
+                        m = '<b>'+log["asctime"]+"</b>"+"["+log["message"]+"] "+\
+                            log["message"])
+                html += line + "\n"
+
+        return html
+
+    @get("/logtail")
+    def html_log_tail(self, request):
+        '''
+        This will show all of the lods
+
+        '''
+        params = request.build_get_dict()
+        page = HtmlLogTail(url="/html-logs", html_config=self.html_config)
         return page.html
+
        
     @get("/json-logs")
     def json_log_file(self, result):
